@@ -1,0 +1,1507 @@
+﻿
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>꼬꼬마 세종 말뭉치 활용 시스템</title>
+<link rel="stylesheet" href="/style.css" type="text/css">
+<style>
+.sentXml {
+	width:100%;
+}
+
+.sentXml th {
+	width:120px;
+	font-size:9pt;
+	text-align:left;
+}
+</style>
+
+<script>
+function changeSubMenu(submenu)
+{
+	thisForm.submenu.value = submenu;
+	thisForm.submit();
+}
+
+function changeTabMenu(tab)
+{
+	thisForm.tabMenu.value = tab;
+	thisForm.submit();
+}
+
+function viewTreeVis(fileId, treeId)
+{
+	var url = "/visualize?submenu=VIEW_SYNTREE&fileId="+fileId+"&treeId="+treeId;
+	var opt = "width=800,height=600,toolbar=no,scrollbars=yes,resizable=yes,menubar=no,statusbar=yes";
+	window.open(url, "viewSyntree", opt);
+}
+
+function viewSentDetail(detailId)
+{
+	var obj = document.getElementById(detailId);
+	if( obj.style.display == "" ) {
+		obj.style.display = "none";
+	} else {
+		obj.style.display = "";
+	}
+}
+
+function viewSentContext(fileId, partId, sentId)
+{
+	var url = "/search?submenu=VIEW_CONTEXT&fileId="+fileId+"&partId="+partId+"&sentId="+sentId;
+	var opt = "width=800,height=400,toolbar=no,scrollbars=yes,resizable=yes,menubar=no,statusbar=yes";
+	window.open(url, "viewSyntree", opt);
+}
+
+function viewFileDetail(fileId)
+{
+	window.open("/statistic?submenu=filedetail&fileId="+fileId, "", "width=800, height=600, scrollbars=yes, toolbar=no, menubar=no, resizable=yes");
+}
+
+function viewExample(patternId, pattern, page)
+{
+	if( patternId == -1 && pattern == '') return;
+	var obj = document.getElementById("exampleView");
+	var url = "/concordancer";
+	var f = document.getElementById("thisForm");
+	f.patternId.value = patternId;
+	f.pattern.value = pattern;
+	if( f.patternDirect != null ) f.patternDirect.value = pattern;
+	var params = "method=getPatternExamples&patternId="+patternId+"&pattern="+pattern+"&page="+page;
+	params += "&wsType="+f.wsType.value;
+	params += "&textClassLv2="+f.textClassLv2.value;
+	params += "&textClassLv3="+f.textClassLv3.value;
+	params += "&textClassLv4="+f.textClassLv4.value;
+	
+	obj.innerHTML = "<img src='/img/loading_wh.gif'/>";
+	makeHttpRequest(url, params, 'showExample', false);
+}
+
+
+function showExample(res)
+{
+	var obj = document.getElementById("exampleView");
+	obj.innerHTML = res;
+}
+
+
+function goPage(page)
+{
+	var f = document.getElementById("thisForm");
+	viewExample(f.patternId.value, f.pattern.value, page);
+}
+
+function updateExamples()
+{
+	var f = document.getElementById("thisForm");
+	//updateTextClassView();
+	f.submit();
+	//viewExample(f.patternId.value, f.pattern.value, f.page.value);
+}
+
+function updateTextClassView()
+{
+	var url = "/concordancer";
+	var params = "method=getTextClasses";
+	var f = document.getElementById("thisForm");
+	params += "&wsType="+f.wsType.value;
+	params += "&textClassLv2="+f.textClassLv2.value;
+	params += "&textClassLv3="+f.textClassLv3.value;
+	params += "&textClassLv4="+f.textClassLv4.value;
+	makeHttpRequest(url, params, 'showTextClassView', false);
+}
+
+function showTextClassView(res)
+{
+	var obj = document.getElementById("textClassView");
+	alert(res);
+	obj.innerHTML = res;
+}
+</script>
+</head>
+<body>
+
+
+
+
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  // rocker.snu.ac.kr:8080
+  //_gaq.push(['_setAccount', 'UA-16408533-2']);
+  // kkma-sc.snu.ac.kr
+  _gaq.push(['_setAccount', 'UA-16408533-4']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+<script>
+//alert("URL is changed to http://kkma-sc.snu.ac.kr");
+//location.replace("http://kkma-sc.snu.ac.kr");
+
+function openReload()
+{
+	var url = "/reload?key=nwEzyvHnHSgBwIPKOBPm2UUAlLII2xy/B0YEcy4Ss74=";
+	var opt = "toolbars=no,noresize,scrollbar=no,width=300,height=350";
+	window.open(url, "reload", opt);
+}
+
+function hideTop()
+{
+	if( window.opener != null ) {
+		var obj = document.getElementById("banner");
+		obj.style.display="none";
+	}
+}
+</script>
+
+
+<body onLoad="hideTop()"></body>
+
+<table align="center" style="width:1000px;" cellspacing="0">
+	<col width="50"/>
+	<col width="140"/>
+	<col width="150"/>
+	<col width="160"/>
+	<col width="140"/>
+	<col width="160"/>
+	<col width="*"/>
+	<tr style="display:none;" id="banner">
+		<td colspan="7" style="font-size:30px;text-align:center;height:80;" background="/img/head_background.gif">
+		</td>
+	</tr>
+	<tr><td colspan="7" height="5" align="center"></td></tr>
+	<tr>
+		<td class="menu_td_margin">&nbsp;</td>
+		<td class="menu_td"><div><a href="/")>꼬꼬마 소개</a></div></td>
+		<td class="menu_td"><div><a href="/documents/index.jsp")>형태소 분석기</a></div></td>
+		<td class="menu_td"><div><a href="/statistic")>말뭉치 통계 조회</a></div></td>
+		<td class="menu_td_selected"><div><a href="/search">말뭉치 검색</a></div></td>
+		<!-- td class="menu_td"><div><a href="/linguistics")>양식 조회</a></div></td-->
+		<td class="menu_td"><div><a href="/concordancer")>한국어 쓰기 학습</a></div></td>
+		<!-- td class="menu_td"><div><a href="/vis/")>연어 시각화</a></div></td-->
+		<!-- td class="menu_td"><div><a href="/analyze")>분석기</a></div></td-->
+		<!-- td class="menu_td"><div><a href="/openapi/spec/")>Open API</a></div></td-->
+		<td class="menu_td_margin">&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="7" valign="top" style="text-align:left;padding:20px;border-left:3px solid #000000;border-right:3px solid #000000;" id="content">
+
+<table border="0" width="100%"  cellspacing="0" cellpadding="0">
+<form id="thisForm" name="thisForm" action="/search" method="post">
+<input type="hidden" name="submenu" value="MORP" id="thisForm_submenu"/>
+<input type="hidden" name="page" value="1" id="thisForm_page"/>
+<input type="hidden" name="viewPage" value="4" id="thisForm_viewPage"/>
+<input type="hidden" name="viewMorp" value="서" id="thisForm_viewMorp"/>
+<input type="hidden" name="viewMorps" value="" id="thisForm_viewMorps"/>
+<input type="hidden" name="viewPos" value="JKB" id="thisForm_viewPos"/>
+<input type="hidden" name="viewSem" value="" id="thisForm_viewSem"/>
+<input type="hidden" name="tabMenu" value="SENT" id="thisForm_tabMenu"/>
+	<col width="250"/>
+	<col width="*"/>
+	<tr>
+		<td colspan="2" style="border:1px dashed #444444;padding:5px;background:#eeeeee;">
+		
+			<div style="text-align:right">
+				(검색된 형태소 수: 14 개)
+				<span class="tlabel">페이지당 목록수</span><select name="pageSize" id="thisForm_pageSize">
+    <option value="10">10</option>
+    <option value="20">20</option>
+    <option value="30">30</option>
+    <option value="40">40</option>
+    <option value="100">100</option>
+    <option value="200">200</option>
+    <option value="300">300</option>
+    <option value="400">400</option>
+    <option value="500" selected="selected">500</option>
+    <option value="10000">10000</option>
+
+
+</select>
+				<span class="tlabel">형태소</span><input type="text" name="morp" value="서" id="thisForm_morp" style="width:100px;height:18px;"/>
+				<select name="match" id="thisForm_match">
+    <option value="EXACT" selected="selected">완전일치</option>
+    <option value="PARTIAL">부분일치</option>
+
+
+</select>
+				<span class="tlabel">품사</span><select name="pos" id="thisForm_pos">
+    <option value="">전체</option>
+    <option value="NNG">NNG</option>
+    <option value="NNP">NNP</option>
+    <option value="NNB">NNB</option>
+    <option value="NR">NR</option>
+    <option value="NP">NP</option>
+    <option value="VV">VV</option>
+    <option value="VA">VA</option>
+    <option value="VX">VX</option>
+    <option value="VCP">VCP</option>
+    <option value="VCN">VCN</option>
+    <option value="MM">MM</option>
+    <option value="MAG">MAG</option>
+    <option value="MAJ">MAJ</option>
+    <option value="IC">IC</option>
+    <option value="JKS">JKS</option>
+    <option value="JKC">JKC</option>
+    <option value="JKG">JKG</option>
+    <option value="JKO">JKO</option>
+    <option value="JKB">JKB</option>
+    <option value="JKV">JKV</option>
+    <option value="JKQ">JKQ</option>
+    <option value="JX">JX</option>
+    <option value="JC">JC</option>
+    <option value="EP">EP</option>
+    <option value="EF">EF</option>
+    <option value="EC">EC</option>
+    <option value="ETN">ETN</option>
+    <option value="ETM">ETM</option>
+    <option value="XPN">XPN</option>
+    <option value="XSN">XSN</option>
+    <option value="XSV">XSV</option>
+    <option value="XSA">XSA</option>
+    <option value="XR">XR</option>
+    <option value="SF">SF</option>
+    <option value="SP">SP</option>
+    <option value="SS">SS</option>
+    <option value="SE">SE</option>
+    <option value="SO">SO</option>
+    <option value="SW">SW</option>
+    <option value="NF">NF</option>
+    <option value="NV">NV</option>
+    <option value="NA">NA</option>
+    <option value="UNA">UNA</option>
+    <option value="UNC">UNC</option>
+    <option value="UNT">UNT</option>
+    <option value="SL">SL</option>
+    <option value="SH">SH</option>
+    <option value="SN">SN</option>
+
+
+</select>
+				<input type="submit" id="thisForm_0" value="검색" onclick="thisForm.page.value=1;thisForm.viewMorp.value='';thisForm.viewPos.value='';thisForm.viewSem.value='';"/>
+
+			</div>
+			
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="height:10px;"></td>
+	</tr>
+	<tr>
+		<td valign="top" style="border-right:solid 0px #aaaaaa;padding-right:10px;">
+		
+			<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
+				<col width="30"/>
+				<col width="60"/>
+				<col width="60"/>
+				<col width="*"/>
+				<tr>
+					<td class="tab_td_margin">&nbsp;</td>
+					<td class="tab_td_selected"><div><a href="javascript:changeSubMenu('MORP')">형태소</a></div></td>
+					<td class="tab_td"><div><a href="javascript:changeSubMenu('MORPS')">표층형</a></div></td>
+					<td class="tab_td_margin">&nbsp;</td>
+				</tr>
+			</table>
+			
+			 
+			
+
+
+<script>
+function viewSent(morp, pos, sem)
+{
+	thisForm.viewMorp.value = morp;
+	thisForm.viewPos.value = pos;
+	thisForm.viewSem.value = sem;
+	thisForm.viewPage.value = 1;
+	thisForm.submit();
+}
+</script>
+
+
+<table class="def_table" cellpadding="1" cellspacing="0" border="1" bordercolor="#555555" style="border-collapse: collapse; border: solid 2px #555555;">
+	<tr>
+		<th style="border-bottom:2px solid #555555;">형태소</th>
+		<th style="border-bottom:2px solid #555555;">품사</th>
+		<th style="border-bottom:2px solid #555555;">횟수</th>
+		<th style="border-bottom:2px solid #555555;">비율</th>
+	</tr>
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','JKB','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','JKB','');">JKB</a>
+		</td>
+		<td style="text-align:right;">15,081</td>
+		<td style="text-align:right;">0.05%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','VV','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','VV','');">VV</a>
+		</td>
+		<td style="text-align:right;">9,874</td>
+		<td style="text-align:right;">0.03%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','JKS','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','JKS','');">JKS</a>
+		</td>
+		<td style="text-align:right;">957</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;border-bottom:dotted 1px #555555;border-top:2px solid #555555;">
+			<a href="javascript:viewSent('서','NNG','');">서</a>
+		</td>
+		<td style="text-align:center;border-bottom:dotted 1px #555555;border-top:2px solid #555555;">
+			<a href="javascript:viewSent('서','NNG','');">NNG</a>
+		</td>
+		<td style="text-align:right;border-bottom:dotted 1px #555555;border-top:2px solid #555555;">639</td>
+		<td style="text-align:right;border-bottom:dotted 1px #555555;border-top:2px solid #555555;">0.00%</td>
+	</tr>
+	
+	<tr>
+		<td colspan="4" style="border-top:none;border-bottom:2px solid #555555;">
+			<ol style="margin-bottom:0px;">
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__00');">서__00</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__03');">서__03</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__05');">서__05</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__06');">서__06</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__07');">서__07</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__08');">서__08</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__10');">서__10</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__15');">서__15</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__16');">서__16</a>
+				</li>
+			
+				<li >
+					<a href="javascript:viewSent('서','NNG','서__88');">서__88</a>
+				</li>
+			
+			</ol>
+		</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','NNP','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','NNP','');">NNP</a>
+		</td>
+		<td style="text-align:right;">421</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','EC','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','EC','');">EC</a>
+		</td>
+		<td style="text-align:right;">70</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','MM','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','MM','');">MM</a>
+		</td>
+		<td style="text-align:right;">51</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','UNT','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','UNT','');">UNT</a>
+		</td>
+		<td style="text-align:right;">23</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','NA','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','NA','');">NA</a>
+		</td>
+		<td style="text-align:right;">13</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','EF','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','EF','');">EF</a>
+		</td>
+		<td style="text-align:right;">6</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','IC','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','IC','');">IC</a>
+		</td>
+		<td style="text-align:right;">3</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','JX','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','JX','');">JX</a>
+		</td>
+		<td style="text-align:right;">2</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','VX','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','VX','');">VX</a>
+		</td>
+		<td style="text-align:right;">1</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+
+	<tr onMouseOver="this.style.background='ECFEB4';" onMouseOut="this.style.background='';" >
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','MAJ','');">서</a>
+		</td>
+		<td style="text-align:center;">
+			<a href="javascript:viewSent('서','MAJ','');">MAJ</a>
+		</td>
+		<td style="text-align:right;">1</td>
+		<td style="text-align:right;">0.00%</td>
+	</tr>
+	
+	
+</table>
+<script>
+function goPage(page)
+{
+	thisForm.page.value = page;
+	thisForm.submit();
+}
+</script>
+
+<div class="paging">
+&nbsp;◀&nbsp;&nbsp;<b>1</b>&nbsp;&nbsp;▶&nbsp;
+</div>
+
+ 
+			 
+		
+		</td>
+		<td valign="top" style="padding-left:10px;">
+		
+			<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
+				<col width="30"/>
+				<col width="80"/>
+				<col width="80"/>
+				<col width="60"/>
+				<col width="50"/>
+				<col width="80"/>
+				<col width="100"/>
+				<col width="60"/>
+				<col width="*"/>
+				<tr>
+					<td class="tab_td_margin">&nbsp;</td>
+					<td class="tab_td_selected"><div><a href="javascript:changeTabMenu('SENT')">용례 조회</a></div></td>
+					<td class="tab_td"><div><a href="javascript:changeTabMenu('SYN')">구문 분석</a></div></td>
+					<td class="tab_td"><div><a href="javascript:changeTabMenu('INFLECTION')">굴절형</a></div></td>
+					<td class="tab_td"><div><a href="javascript:changeTabMenu('BIGRAM')">연어</a></div></td>
+					<td class="tab_td"><div><a href="javascript:changeTabMenu('POS_GIVEN_MORP')">품사 연어</a></div></td>
+					<td class="tab_td"><div><a href="javascript:changeTabMenu('BIVIS')">연어 시각화</a></div></td>
+					<td class="tab_td"><div><a href="javascript:changeTabMenu('NGRAM')">다연어</a></div></td>
+					<td class="tab_td_margin">&nbsp;</td>
+				</tr>
+			</table>
+			
+			
+			<div id="textClassView" style="text-align:right;margin-bottom:10px;background:#eeeeee;padding:3px;">
+				
+
+
+<select name="wsType" id="thisForm_wsType" onchange="updateExamples()">
+    <option value="W">문어</option>
+    <option value="S" selected="selected">구어</option>
+
+
+</select>
+<span class="tlabel">출판 형식</span><select name="textClassLv2" id="thisForm_textClassLv2" onchange="updateExamples()">
+    <option value=""
+    >출판 형식 선택</option>
+    <option value="__6__">화면이 있는 방송 (TV) 녹화 &gt; 전사</option>
+    <option value="__7__">화면이 없는 방송 (라디오) 녹음 &gt; 전사</option>
+    <option value="__8__">기타 녹음 &gt; 전사</option>
+
+
+</select>
+<span class="tlabel">분야</span><select name="textClassLv3" id="thisForm_textClassLv3" onchange="updateExamples()">
+    <option value=""
+    >분야 선택</option>
+
+
+</select>
+<span class="tlabel">내용</span><select name="textClassLv4" id="thisForm_textClassLv4" onchange="updateExamples()">
+    <option value=""
+    >내용 선택</option>
+
+
+</select>
+			</div>
+			 
+
+						
+			<div style="text-align:right">
+	
+			(검색 결과: 1,519 개)
+			
+			 
+			
+			<span class="tlabel">형태소</span><span class="tvalue">서</span>
+			
+			
+			<span class="tlabel">품사</span><span class="tvalue">JKB</span>
+			
+			
+			<select name="viewPageSize" id="thisForm_viewPageSize" onchange="thisForm.submit()">
+    <option value="10">10</option>
+    <option value="20">20</option>
+    <option value="30">30</option>
+    <option value="40">40</option>
+    <option value="100">100</option>
+    <option value="200">200</option>
+    <option value="300">300</option>
+    <option value="400">400</option>
+    <option value="500" selected="selected">500</option>
+    <option value="10000">10000</option>
+
+
+</select>
+			<input type="submit" id="thisForm_2" value="적용"/>
+
+			</div>
+		
+			
+			
+			<div id="exampleView"></div>
+			
+			 
+			
+
+
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3447:1851:2')" >
+				<span style='color:red;font-weight:bold;'>여기서</span> 어떤 통일성이 나올 테니까. 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3447)" style="font-size:8pt;color:blue;">
+					주제대화_광고토론, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3447','1851','2')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3447:1851:2" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>여기서</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>어떤</th>
+<td>어떤/MM</td>
+</tr>
+<tr>
+<th>통일성이</th>
+<td>통일/NNG + 성/XSN + 이/JKS</td>
+</tr>
+<tr>
+<th>나올</th>
+<td>나오/VV + ㄹ/ETM</td>
+</tr>
+<tr>
+<th>테니까.</th>
+<td>터/NNB + (이)/VCP + 니까/EC + ./SF</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3272:1952:1')" >
+				중요한 게 <span style='color:red;font-weight:bold;'>여기서.</span> 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3272)" style="font-size:8pt;color:blue;">
+					일상대화_미팅, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3272','1952','1')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3272:1952:1" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>중요한</th>
+<td>중요/XR + 하/XSA + ㄴ/ETM</td>
+</tr>
+<tr>
+<th>게</th>
+<td>거/NNB + ㅣ/JKS</td>
+</tr>
+<tr>
+<th>여기서.</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span> + ./SF</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3447:1958:0')" >
+				이 얘네는 유명인이 <span style='color:red;font-weight:bold;'>거기서</span> 그 고전적 조건을 사용했는데 얘네는 그냥, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3447)" style="font-size:8pt;color:blue;">
+					주제대화_광고토론, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3447','1958','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3447:1958:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>이</th>
+<td>이/MM</td>
+</tr>
+<tr>
+<th>얘네는</th>
+<td>얘/NP + 네/XSN + 는/JX</td>
+</tr>
+<tr>
+<th>유명인이</th>
+<td>유명/NNG + 인/XSN + 이/JKS</td>
+</tr>
+<tr>
+<th>거기서</th>
+<td>거기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>그</th>
+<td>그/MM</td>
+</tr>
+<tr>
+<th>고전적</th>
+<td>고전/NNG + 적/XSN</td>
+</tr>
+<tr>
+<th>조건을</th>
+<td>조건/NNG + 을/JKO</td>
+</tr>
+<tr>
+<th>사용했는데</th>
+<td>사용/NNG + 하/XSV + ㅕㅆ/EP + 는데/EC</td>
+</tr>
+<tr>
+<th>얘네는</th>
+<td>얘/NP + 네/XSN + 는/JX</td>
+</tr>
+<tr>
+<th>그냥,</th>
+<td>그냥/MAG + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3447:1991:0')" >
+				XX 색감이 <span style='color:red;font-weight:bold;'>여기서는</span> 표현이 안 됐지, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3447)" style="font-size:8pt;color:blue;">
+					주제대화_광고토론, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3447','1991','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3447:1991:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>XX</th>
+<td>XX/UNC</td>
+</tr>
+<tr>
+<th>색감이</th>
+<td>색감/NNG + 이/JKS</td>
+</tr>
+<tr>
+<th>여기서는</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span> + 는/JX</td>
+</tr>
+<tr>
+<th>표현이</th>
+<td>표현/NNG + 이/JKS</td>
+</tr>
+<tr>
+<th>안</th>
+<td>안/MAG</td>
+</tr>
+<tr>
+<th>됐지,</th>
+<td>되/VV + ㅓㅆ/EP + 지/EF + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3273:2192:0')" >
+				그래서 또 <span style='color:red;font-weight:bold;'>거기서</span> 딴 데로 했더니, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3273)" style="font-size:8pt;color:blue;">
+					일상대화_삼십대, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3273','2192','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3273:2192:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>그래서</th>
+<td>그래서/MAJ</td>
+</tr>
+<tr>
+<th>또</th>
+<td>또/MAG</td>
+</tr>
+<tr>
+<th>거기서</th>
+<td>거기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>딴</th>
+<td>딴/MM</td>
+</tr>
+<tr>
+<th>데로</th>
+<td>데/NNB + 로/JKB</td>
+</tr>
+<tr>
+<th>했더니,</th>
+<td>하/VV + ㅕㅆ/EP + 더니/EC + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3273:2157:2')" >
+				그래서 <span style='color:red;font-weight:bold;'>여기서</span> 아저씨가 운전을 원래 이렇게 해요? 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3273)" style="font-size:8pt;color:blue;">
+					일상대화_삼십대, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3273','2157','2')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3273:2157:2" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>그래서</th>
+<td>그래서/MAJ</td>
+</tr>
+<tr>
+<th>여기서</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>아저씨가</th>
+<td>아저씨/NNG + 가/JKS</td>
+</tr>
+<tr>
+<th>운전을</th>
+<td>운전/NNG + 을/JKO</td>
+</tr>
+<tr>
+<th>원래</th>
+<td>원래/MAG</td>
+</tr>
+<tr>
+<th>이렇게</th>
+<td>이렇게/MAG</td>
+</tr>
+<tr>
+<th>해요?</th>
+<td>하/VV + ㅕ요/EF + ?/SF</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3272:2655:0')" >
+				<span style='color:red;font-weight:bold;'>거기서</span> 왼쪽에 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3272)" style="font-size:8pt;color:blue;">
+					일상대화_미팅, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3272','2655','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3272:2655:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>거기서</th>
+<td>거기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>왼쪽에</th>
+<td>왼쪽/NNG + 에/JKB</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3355:2012:5')" >
+				<span style='color:red;font-weight:bold;'>거기서도</span> 그래, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3355)" style="font-size:8pt;color:blue;">
+					주점대화_대학생3인, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3355','2012','5')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3355:2012:5" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>거기서도</th>
+<td>거기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span> + 도/JX</td>
+</tr>
+<tr>
+<th>그래,</th>
+<td>그러/VV + ㅕ/EF + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3355:2026:0')" >
+				이제 <span style='color:red;font-weight:bold;'>거기서</span> 인제 그때 당시에 내가 결론 내린 거는 소울메이트는 없다. 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3355)" style="font-size:8pt;color:blue;">
+					주점대화_대학생3인, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3355','2026','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3355:2026:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>이제</th>
+<td>이제/IC</td>
+</tr>
+<tr>
+<th>거기서</th>
+<td>거기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>인제</th>
+<td>인제/IC</td>
+</tr>
+<tr>
+<th>그때</th>
+<td>그때/NNG</td>
+</tr>
+<tr>
+<th>당시에</th>
+<td>당시/NNG + 에/JKB</td>
+</tr>
+<tr>
+<th>내가</th>
+<td>내/NP + 가/JKS</td>
+</tr>
+<tr>
+<th>결론</th>
+<td>결론/NNG</td>
+</tr>
+<tr>
+<th>내린</th>
+<td>내리/VV + ㄴ/ETM</td>
+</tr>
+<tr>
+<th>거는</th>
+<td>거/NNB + 는/JX</td>
+</tr>
+<tr>
+<th>소울메이트는</th>
+<td>소울메이트/NNG + 는/JX</td>
+</tr>
+<tr>
+<th>없다.</th>
+<td>없/VA + 다/EF + ./SF</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3273:2029:3')" >
+				그 웅진닷컴 외부 운영하면서 <span style='color:red;font-weight:bold;'>거기서</span> 손해를 어느 정도 되는 점은 있더라두, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3273)" style="font-size:8pt;color:blue;">
+					일상대화_삼십대, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3273','2029','3')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3273:2029:3" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>그</th>
+<td>그/MM</td>
+</tr>
+<tr>
+<th>웅진닷컴</th>
+<td>웅진닷컴/NNP</td>
+</tr>
+<tr>
+<th>외부</th>
+<td>외부/NNG</td>
+</tr>
+<tr>
+<th>운영하면서</th>
+<td>운영/NNG + 하/XSV + 면서/EC</td>
+</tr>
+<tr>
+<th>거기서</th>
+<td>거기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>손해를</th>
+<td>손해/NNG + 를/JKO</td>
+</tr>
+<tr>
+<th>어느</th>
+<td>어느/MM</td>
+</tr>
+<tr>
+<th>정도</th>
+<td>정도/NNG</td>
+</tr>
+<tr>
+<th>되는</th>
+<td>되/VV + 는/ETM</td>
+</tr>
+<tr>
+<th>점은</th>
+<td>점/NNB + 은/JX</td>
+</tr>
+<tr>
+<th>있더라두,</th>
+<td>있/VA + 더라두/EC + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3273:2142:6')" >
+				그~ 뭐 얘기해도 뭐~ <span style='color:red;font-weight:bold;'>여기서</span> 우회전이거든요. 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3273)" style="font-size:8pt;color:blue;">
+					일상대화_삼십대, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3273','2142','6')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3273:2142:6" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>그~</th>
+<td>그/IC</td>
+</tr>
+<tr>
+<th>뭐</th>
+<td>뭐/NP</td>
+</tr>
+<tr>
+<th>얘기해도</th>
+<td>얘기/NNG + 하/XSV + ㅕ도/EC</td>
+</tr>
+<tr>
+<th>뭐~</th>
+<td>뭐/IC</td>
+</tr>
+<tr>
+<th>여기서</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>우회전이거든요.</th>
+<td>우회전/NNG + 이/VCP + 거든요/EF + ./SF</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3273:2144:1')" >
+				그 담에 그 다음에 <span style='color:red;font-weight:bold;'>여기서는</span> 오른쪽으로 붙으셔야 되는데, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3273)" style="font-size:8pt;color:blue;">
+					일상대화_삼십대, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3273','2144','1')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3273:2144:1" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>그</th>
+<td>그/MM</td>
+</tr>
+<tr>
+<th>담에</th>
+<td>담/NNG + 에/JKB</td>
+</tr>
+<tr>
+<th>그</th>
+<td>그/MM</td>
+</tr>
+<tr>
+<th>다음에</th>
+<td>다음/NNG + 에/JKB</td>
+</tr>
+<tr>
+<th>여기서는</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span> + 는/JX</td>
+</tr>
+<tr>
+<th>오른쪽으로</th>
+<td>오른쪽/NNG + 으로/JKB</td>
+</tr>
+<tr>
+<th>붙으셔야</th>
+<td>붙/VV + 으시/EP + ㅓ야/EC</td>
+</tr>
+<tr>
+<th>되는데,</th>
+<td>되/VV + 는데/EC + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3355:2112:0')" >
+				내가 경험해서 알고 있는데 <span style='color:red;font-weight:bold;'>여기서</span> 딱 끊고서 넘어가야지 <span style='color:red;font-weight:bold;'>여기서</span> 나만 딱 끊었다가는, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3355)" style="font-size:8pt;color:blue;">
+					주점대화_대학생3인, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3355','2112','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3355:2112:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>내가</th>
+<td>내/NP + 가/JKS</td>
+</tr>
+<tr>
+<th>경험해서</th>
+<td>경험/NNG + 하/XSV + ㅕ서/EC</td>
+</tr>
+<tr>
+<th>알고</th>
+<td>알/VV + 고/EC</td>
+</tr>
+<tr>
+<th>있는데</th>
+<td>있/VX + 는데/EC</td>
+</tr>
+<tr>
+<th>여기서</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>딱</th>
+<td>딱/MAG</td>
+</tr>
+<tr>
+<th>끊고서</th>
+<td>끊/VV + 고서/EC</td>
+</tr>
+<tr>
+<th>넘어가야지</th>
+<td>넘어가/VV + ㅏ야지/EF</td>
+</tr>
+<tr>
+<th>여기서</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>나만</th>
+<td>나/NP + 만/JX</td>
+</tr>
+<tr>
+<th>딱</th>
+<td>딱/MAG</td>
+</tr>
+<tr>
+<th>끊었다가는,</th>
+<td>끊/VV + 었/EP + 다가는/EC + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3273:2268:0')" >
+				근데 우준 씨 이렇게 <span style='color:red;font-weight:bold;'>가까이서</span> 보니까 되게 어려 보인다, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3273)" style="font-size:8pt;color:blue;">
+					일상대화_삼십대, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3273','2268','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3273:2268:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>근데</th>
+<td>근데/MAJ</td>
+</tr>
+<tr>
+<th>우준</th>
+<td>우준/NNP</td>
+</tr>
+<tr>
+<th>씨</th>
+<td>씨/NNB</td>
+</tr>
+<tr>
+<th>이렇게</th>
+<td>이렇게/MAG</td>
+</tr>
+<tr>
+<th>가까이서</th>
+<td>가까이/NNG + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>보니까</th>
+<td>보/VV + 니까/EC</td>
+</tr>
+<tr>
+<th>되게</th>
+<td>되게/MAG</td>
+</tr>
+<tr>
+<th>어려</th>
+<td>어리/VA + ㅓ/EC</td>
+</tr>
+<tr>
+<th>보인다,</th>
+<td>보이/VV + ㄴ다/EF + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3272:2369:1')" >
+				검찰청 이런 <span style='color:red;font-weight:bold;'>데서</span> 뭐~. 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3272)" style="font-size:8pt;color:blue;">
+					일상대화_미팅, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3272','2369','1')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3272:2369:1" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>검찰청</th>
+<td>검찰청/NNP</td>
+</tr>
+<tr>
+<th>이런</th>
+<td>이런/MM</td>
+</tr>
+<tr>
+<th>데서</th>
+<td>데/NNB + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>뭐~.</th>
+<td>뭐/IC + ./SF</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3272:2475:0')" >
+				<span style='color:red;font-weight:bold;'>거기서</span> 버스 타고 어디 간 적 없는데요, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3272)" style="font-size:8pt;color:blue;">
+					일상대화_미팅, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3272','2475','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3272:2475:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>거기서</th>
+<td>거기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>버스<phon>뻐스</phon></th>
+<td>버스/NNG</td>
+</tr>
+<tr>
+<th>타고</th>
+<td>타/VV + 고/EC</td>
+</tr>
+<tr>
+<th>어디</th>
+<td>어디/MAG</td>
+</tr>
+<tr>
+<th>간</th>
+<td>가/VV + ㄴ/ETM</td>
+</tr>
+<tr>
+<th>적</th>
+<td>적/NNB</td>
+</tr>
+<tr>
+<th>없는데요,</th>
+<td>없/VA + 는데요/EF + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3272:2224:1')" >
+				<span style='color:red;font-weight:bold;'>여기서는.</span> 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3272)" style="font-size:8pt;color:blue;">
+					일상대화_미팅, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3272','2224','1')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3272:2224:1" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>여기서는.</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span> + 는/JX + ./SF</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3272:2309:0')" >
+				<span style='color:red;font-weight:bold;'>여기서</span> 말하면 잘 안 들린대, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3272)" style="font-size:8pt;color:blue;">
+					일상대화_미팅, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3272','2309','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3272:2309:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>여기서</th>
+<td>여기/NP + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>말하면</th>
+<td>말/NNG + 하/XSV + 면/EC</td>
+</tr>
+<tr>
+<th>잘</th>
+<td>잘/MAG</td>
+</tr>
+<tr>
+<th>안</th>
+<td>안/MAG</td>
+</tr>
+<tr>
+<th>들린대,</th>
+<td>들리/VV + ㄴ대/EF + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+	<div style="padding:0px; border:1px dashed #888888;margin-top:10px;width:100%;">
+		<div style="padding:5px;">
+			<a href="javascript:viewSentDetail('3272:2311:0')" >
+				<span style='color:red;font-weight:bold;'>가까이서</span> 말해 주세요, 
+			</a>
+			<span style="font-size:8pt;color:blue;">&lt;출처: 
+				<a href="javascript:viewFileDetail(3272)" style="font-size:8pt;color:blue;">
+					일상대화_미팅, 형태소 분석 전자파일</a>&gt;</span>
+			<a href="javascript:viewSentContext('3272','2311','0')" >
+				[주변 문장 보기]</a>
+		</div>
+		<div id="3272:2311:0" style="display:none;background:#eeeeee;padding:5px;">
+			<table class="sentXml">
+<tr>
+<th>가까이서</th>
+<td>가까이/NNG + <span style='color:red;font-weight:bold;'>서/JKB</span></td>
+</tr>
+<tr>
+<th>말해</th>
+<td>말/NNG + 하/XSV + ㅕ/EC</td>
+</tr>
+<tr>
+<th>주세요,</th>
+<td>주/VX + 시/EP + ㅔ요/EF + ,/SP</td>
+</tr>
+</table>
+</div>
+	</div>
+
+
+<script>
+function goViewPage(page)
+{
+	thisForm.viewPage.value = page;
+	thisForm.submit();
+}
+</script>
+
+<div class="paging">
+&nbsp;◀&nbsp;&nbsp;<a href="javascript:goViewPage('1');">1</a>&nbsp;&nbsp;<a href="javascript:goViewPage('2');">2</a>&nbsp;&nbsp;<a href="javascript:goViewPage('3');">3</a>&nbsp;&nbsp;<b>4</b>&nbsp;&nbsp;▶&nbsp;
+</div>
+
+			 
+		
+		
+		</td>
+	</tr>
+</form>
+
+
+
+
+</table>
+
+
+
+		</td>
+	</tr>
+	<tr>
+		<td colspan="7" style="border-top:3px solid #000000;font-size:9pt;text-align:center;padding:10px;">
+			Copyright ⓒ 2009 Team 꼬꼬마(KKMA). All rights reserved.<br/>
+			꼬꼬마 세종 말뭉치 활용 시스템은 현재 <b>세종 말뭉치 2010년 배포판</b>을 이용하고 있습니다.
+		</td>
+	</tr>
+</table> 
+
+</body>
+</html>

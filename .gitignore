@@ -91,3 +91,7 @@ ENV/
 # Database
 db.sqlite3
 *.sqlite3*
+
+# Raw crawl file
+_raw
+_raw/*

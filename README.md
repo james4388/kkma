@@ -1,2 +1,2 @@
 # kkma
-Classify nound phrase example
+Classify noun phrase example

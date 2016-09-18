@@ -122,7 +122,7 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
     def get_export_queryset(self, request):
         qs = super(ExampleAdmin, self).get_export_queryset(request)
         
-        limit = request.GET.get('limit')
+        limit = request.POST.get('limit', request.GET.get('limit'))
         try:
             limit = int(limit)
         except:

@@ -16,7 +16,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 
 
 class IgnoreParamChangeList(ChangeList):
-    ignore_params = ['object_index']
+    ignore_params = ['object_index', 'limit']
     
     def get_filters_params(self, params=None):
         lookup_params = super(IgnoreParamChangeList, self).get_filters_params(params)
@@ -114,6 +114,22 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
     
     change_list_template = 'kkma/example/change_list.html'
     flash_card_template = 'kkma/example/flash_card.html'
+    
+    def get_changelist(self, request, **kwargs):
+        return IgnoreParamChangeList
+    
+    # Allow limit result
+    def get_export_queryset(self, request):
+        qs = super(ExampleAdmin, self).get_export_queryset(request)
+        
+        limit = request.GET.get('limit')
+        try:
+            limit = int(limit)
+        except:
+            pass
+        if limit and isinstance(limit, int):
+            qs = qs[:limit]
+        return qs
     
     def get_urls(self):
         urls = super(ExampleAdmin, self).get_urls()

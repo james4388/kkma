@@ -13,6 +13,7 @@ from django.utils.encoding import force_text, smart_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse_lazy, reverse
+from django.db.models import Count
 
 
 class IgnoreParamChangeList(ChangeList):
@@ -101,7 +102,7 @@ class ExamplePhraseInline(admin.TabularInline):
 class ExampleAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = ExampleResource
     list_display = ('_index', '_content', 'category',
-                    'detail_link', 'context_link')
+                    'detail_link', 'context_link', 'field_id', 'part_id', 'sent_id')
     list_editable = ('category',)
     list_filter = (
         'ws_type',
@@ -202,9 +203,26 @@ class PhraseExampleInline(admin.TabularInline):
     _example_link.short_description = "Link"
 
 
+class PhraseAdminChangeList(ChangeList):
+    ignore_params = ['object_index', 'limit']
+    
+    def get_queryset(self, request):
+        qs = super(PhraseAdminChangeList, self).get_queryset(request)
+        return qs.annotate(example_count=Count('examples'))
+
+
 class PhraseAdmin(admin.ModelAdmin):
-    list_display = ('phrase', 'count', )
-    readonly_fields = ('phrase', 'count', )
+    list_display = ('phrase', 'example_count', 'count', )
+    readonly_fields = ('phrase', )
+    list_filter = ('examples__ws_type', )
     inlines = (PhraseExampleInline, )
+    
+    def get_changelist(self, request, **kwargs):
+        return PhraseAdminChangeList
+   
+    def example_count(self, instance):
+        return mark_safe(instance.example_count)
+    example_count.short_description = "Count"
+    example_count.admin_order_field = "example_count"
     
 admin.site.register(Phrase, PhraseAdmin)

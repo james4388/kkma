@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'kkma',
     'import_export',
-    #'debug_toolbar',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [

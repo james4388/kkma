@@ -12,7 +12,7 @@ import re
 
 class Phrase(models.Model):
     phrase = models.TextField(unique=True)
-    count = models.IntegerField(default=1)
+    count = models.IntegerField(default=1, verbose_name='Total Count')
     
     class Meta:
         ordering = ('-count',)

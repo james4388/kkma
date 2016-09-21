@@ -26,7 +26,7 @@ if defined _OLD_VIRTUAL_PATH (
 )
 set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
-git checkout -f origin master
+git checkout -f master
 
 start /B python manage.py runserver 0.0.0.0:8000
 

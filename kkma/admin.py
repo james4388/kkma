@@ -214,7 +214,7 @@ class PhraseAdminChangeList(ChangeList):
 class PhraseAdmin(admin.ModelAdmin):
     list_display = ('phrase', 'example_count', 'count', )
     readonly_fields = ('phrase', )
-    list_filter = ('examples__ws_type', )
+    list_filter = ('examples__ws_type', 'examples__category', )
     inlines = (PhraseExampleInline, )
     
     def get_changelist(self, request, **kwargs):

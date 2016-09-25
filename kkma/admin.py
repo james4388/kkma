@@ -15,6 +15,8 @@ from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.db.models import Count
 
+from .forms import FlashcardForm
+
 
 class IgnoreParamChangeList(ChangeList):
     ignore_params = ['object_index', 'limit']
@@ -168,10 +170,33 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
         total = queryset.count()
         
         objects = queryset[object_index:object_index + 1]
+        obj = objects[0] if len(objects) > 0 else None
+        
+        form = None
+        if obj:
+            if request.method == 'POST':
+                form = FlashcardForm(request.POST, instance=obj)
+                if form.is_valid():
+                    form.save()
+            else:
+                form = FlashcardForm(instance=obj)
+        
+        prev_link = None
+        next_link = None
+        queries = request.GET.copy()
+        if object_index > 0:
+            queries['object_index'] = object_index - 1
+            prev_link = queries.urlencode()
+        if object_index < total:
+            queries['object_index'] = object_index + 1
+            next_link = queries.urlencode()
         return render(request, self.flash_card_template, {
-            'object': objects[0] if len(objects) > 0 else None,
+            'object': obj,
             'total': total,
-            'index': object_index
+            'index': object_index,
+            'form': form,
+            'prev_link': prev_link,
+            'next_link': next_link
         })
         
     

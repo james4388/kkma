@@ -1,2 +1,78 @@
-{{object.content|safe}}
-<p>{{index|add:"1"}} / {{total}}</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <title>Flashcard editor</title>
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        
+        <link rel="stylesheet" href="{% static "flashcard.css" %}"/>
+
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="flashcard container">
+            <div class="content">
+                {{object.content|safe}}
+            </div>
+            <div>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{form.category}}
+                </form>
+            </div>
+            <div class="detail-content">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="detail_header">
+                            <h4 class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detail_pannel" aria-expanded="true" aria-controls="detail_pannel">
+                                Show detail and links
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="detail_pannel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detail_header">
+                            <div class="panel-body">
+                                {{object.context_link}} | {{object.detail_link}}
+                                {{object.detail|safe}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="row">
+                    <div class="col-xs-3">
+                        {% if prev_link %}
+                        <a href="?{{prev_link}}">&lt;&lt; Prev</a>
+                        {% endif %}
+                    </div>
+                    <div class="col-xs-6">
+                        {{ index|add:1 }} / {{ total }}
+                    </div>
+                    <div class="col-xs-3">
+                        {% if next_link %}
+                        <a href="?{{next_link}}">Next &gt;&gt;</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script>
+            $('.flashcard form input[type="radio"]').change(function(){
+                $('.flashcard form').submit();
+            });
+        </script>
+    </body>
+</html>

@@ -120,6 +120,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 SUIT_CONFIG = {
     # header
     'ADMIN_NAME': 'Morpheme example categories',

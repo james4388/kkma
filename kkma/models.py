@@ -47,7 +47,8 @@ class Example(models.Model):
         ('근거', '근거'),
         ('비교의 기준', '비교의 기준'),
         ('주어임', '주어임'),
-        ('기타', '기타')
+        ('기타', '기타'),
+        ('추상적 장소', '추상적 장소')
     )
 
     word_type = models.CharField(verbose_name='품사', max_length=5, db_index=True,

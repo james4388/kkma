@@ -45,7 +45,10 @@
                         </div>
                         <div id="detail_pannel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detail_header">
                             <div class="panel-body">
-                                {{object.context_link}} | {{object.detail_link}}
+                                <div class="row">
+                                    <div class="col-sm-4">{{object.context_link}}</div>
+                                    <div class="col-sm-8 text-right">{{object.detail_link}}</div>
+                                </div>
                                 {{object.detail|safe}}
                             </div>
                         </div>

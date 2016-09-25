@@ -20,6 +20,10 @@
     </head>
     <body>
         <div class="flashcard container">
+            <div class="text-right return-link">
+                <a href="{% url 'admin:index' %}">Home</a> / <a href="{% url 'admin:app_list' 'kkma' %}">kkma</a> / <a href="{% url 'admin:kkma_example_changelist' %}?{{filter_link}}">Example</a>
+            </div>
+            {% if object %}
             <div class="content">
                 {{object.content|safe}}
             </div>
@@ -48,6 +52,11 @@
                     </div>
                 </div>
             </div>
+            {% else %}
+            <div class="content text-center">
+                The End!!!
+            </div>
+            {% endif %}
             <div class="footer">
                 <div class="row">
                     <div class="col-xs-3">
@@ -56,7 +65,9 @@
                         {% endif %}
                     </div>
                     <div class="col-xs-6">
-                        {{ index|add:1 }} / {{ total }}
+                        {% if object %}
+                            {{ index|add:1 }} / {{ total }}
+                        {% endif %}
                     </div>
                     <div class="col-xs-3">
                         {% if next_link %}

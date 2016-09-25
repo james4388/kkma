@@ -16,6 +16,11 @@ body {
     padding-bottom: 50px;
 }
 
+.return-link{
+    border-bottom: 1px solid #e6e6e6;
+    font-size: 12px;
+}
+
 .content{
     font-size: 48px;
     line-height: 55px;

@@ -190,13 +190,16 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
         if object_index < total:
             queries['object_index'] = object_index + 1
             next_link = queries.urlencode()
+        queries.pop('object_index', None)
+        filter_link = queries.urlencode()
         return render(request, self.flash_card_template, {
             'object': obj,
             'total': total,
             'index': object_index,
             'form': form,
             'prev_link': prev_link,
-            'next_link': next_link
+            'next_link': next_link,
+            'filter_link': filter_link
         })
         
     

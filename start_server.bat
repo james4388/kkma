@@ -28,6 +28,8 @@ set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
 git checkout -f master
 
+git pull
+
 python manage.py migrate
 
 start /B python manage.py runserver 0.0.0.0:8000

@@ -21,6 +21,8 @@ class FlashcardForm(forms.ModelForm):
         
     def __init__(self, *args, **kwargs):
         super(FlashcardForm, self).__init__(*args, **kwargs)
-        categories = Example.CATEGORY_CHOICES[:]
-        categories += (('None', None), )
+        categories = ((None, '0. None'), )
+        for index, option in enumerate(Example.CATEGORY_CHOICES):
+            new_option = ((option[0], str(index + 1) + '. ' + option[1]), )
+            categories += new_option
         self.fields['category'].choices = categories

@@ -14,13 +14,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.db.models import Count
+from django.shortcuts import get_object_or_404
 
 from .forms import FlashcardForm
 
 
 class IgnoreParamChangeList(ChangeList):
     ignore_params = ['object_index', 'limit']
-    
+
     def get_filters_params(self, params=None):
         lookup_params = super(IgnoreParamChangeList, self).get_filters_params(params)
         for ignored in self.ignore_params:
@@ -34,10 +35,10 @@ class ExampleResource(resources.ModelResource):
         model = Example
         fields = ('index', 'content', 'category',)
         export_order = ('index', 'content', 'category',)
-        
+
     def dehydrate_content(self, row):
         return strip_tags(row.content).replace('&#13;', '')
-        
+
 
 class CategoryListFilter(ChoicesFieldListFilter):
     def choices(self, changelist):
@@ -62,10 +63,8 @@ class CategoryListFilter(ChoicesFieldListFilter):
             }, [self.lookup_kwarg]),
             'display': _('Not set'),
         }
-        none_title = ''
         for lookup, title in self.field.flatchoices:
             if lookup is None:
-                none_title = title
                 continue
             yield {
                 'selected': smart_text(lookup) == self.lookup_val,
@@ -75,7 +74,7 @@ class CategoryListFilter(ChoicesFieldListFilter):
                 'display': title,
             }
 
-            
+
 class ExamplePhraseInline(admin.TabularInline):
     model = Example.phrases.through
     exclude = ('phrase', )
@@ -84,27 +83,28 @@ class ExamplePhraseInline(admin.TabularInline):
     verbose_name = "Examples"
     verbose_name_plural = "Examples"
     can_delete = False
-    
-    
+
     def get_queryset(self, request):
         qs = super(ExamplePhraseInline, self).get_queryset(request)
         return qs.select_related('phrase')
-        
+
     def _phrase_count(self, instance):
         return instance.phrase.count
     _phrase_count.short_description = 'Count'
-    
+
     def _phrase_link(self, instance):
         return mark_safe('<a href="%s" target="_blank">%d</a>' % (
-            reverse('admin:kkma_phrase_change', args=(instance.phrase.id,)), instance.phrase.id
+            reverse('admin:kkma_phrase_change', args=(instance.phrase.id,)),
+            instance.phrase.id
         ))
     _phrase_link.short_description = "Link"
 
-    
+
 class ExampleAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = ExampleResource
     list_display = ('_index', '_content', 'category',
-                    'detail_link', 'context_link', 'field_id', 'part_id', 'sent_id')
+                    'detail_link', 'context_link', 'field_id', 'part_id',
+                    'sent_id')
     list_editable = ('category',)
     list_filter = (
         'ws_type',
@@ -114,17 +114,17 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ('content',)
     exclude = ('phrases', )
     inlines = (ExamplePhraseInline, )
-    
+
     change_list_template = 'kkma/example/change_list.html'
     flash_card_template = 'kkma/example/flash_card.html'
-    
+
     def get_changelist(self, request, **kwargs):
         return IgnoreParamChangeList
-    
+
     # Allow limit result
     def get_export_queryset(self, request):
         qs = super(ExampleAdmin, self).get_export_queryset(request)
-        
+
         limit = request.POST.get('limit', request.GET.get('limit'))
         try:
             limit = int(limit)
@@ -133,7 +133,7 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
         if limit and isinstance(limit, int):
             qs = qs[:limit]
         return qs
-    
+
     def get_urls(self):
         urls = super(ExampleAdmin, self).get_urls()
         my_urls = [
@@ -142,45 +142,48 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
                 name='%s_%s_flashcard' % self.get_model_info()),
         ]
         return my_urls + urls
-        
+
     def get_flashcard_queryset(self, request):
         list_display = self.get_list_display(request)
         list_display_links = self.get_list_display_links(request, list_display)
 
-        cl = IgnoreParamChangeList(request, self.model, list_display,
-                        list_display_links, self.list_filter,
-                        self.date_hierarchy, self.search_fields,
-                        self.list_select_related, self.list_per_page,
-                        self.list_max_show_all, self.list_editable,
-                        self)
+        cl = IgnoreParamChangeList(
+            request, self.model, list_display,
+            list_display_links, self.list_filter,
+            self.date_hierarchy, self.search_fields,
+            self.list_select_related, self.list_per_page,
+            self.list_max_show_all, self.list_editable,
+            self
+        )
         try:
             return cl.queryset
         except AttributeError:
             return cl.query_set
-        
+
     def flash_card_view(self, request, *args, **kwargs):
         object_index = request.GET.get('object_index', 0)
         try:
             object_index = int(object_index)
         except:
             object_index = 0
-        
+
         queryset = self.get_flashcard_queryset(request)
-        
+
         total = queryset.count()
-        
+
         objects = queryset[object_index:object_index + 1]
         obj = objects[0] if len(objects) > 0 else None
-        
+
         form = None
-        if obj:
-            if request.method == 'POST':
-                form = FlashcardForm(request.POST, instance=obj)
-                if form.is_valid():
-                    form.save()
-            else:
+        if request.method == 'POST':
+            obj = get_object_or_404(Example, pk=request.POST.get('pk'))
+            form = FlashcardForm(request.POST, instance=obj)
+            if form.is_valid():
+                form.save()
+        else:
+            if obj:
                 form = FlashcardForm(instance=obj)
-        
+
         prev_link = None
         next_link = None
         queries = request.GET.copy()
@@ -201,8 +204,8 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
             'next_link': next_link,
             'filter_link': filter_link
         })
-        
-    
+
+
 admin.site.register(Example, ExampleAdmin)
 
 
@@ -214,26 +217,26 @@ class PhraseExampleInline(admin.TabularInline):
     verbose_name = "Examples"
     verbose_name_plural = "Examples"
     can_delete = False
-    
-    
+
     def get_queryset(self, request):
         qs = super(PhraseExampleInline, self).get_queryset(request)
         return qs.select_related('example')
-    
+
     def _example(self, instance):
         return mark_safe(instance.example)
     _example.short_description = "Example"
-    
+
     def _example_link(self, instance):
         return mark_safe('<a href="%s" target="_blank">%d</a>' % (
-            reverse('admin:kkma_example_change', args=(instance.example.id,)), instance.example.id
+            reverse('admin:kkma_example_change', args=(instance.example.id,)),
+            instance.example.id
         ))
     _example_link.short_description = "Link"
 
 
 class PhraseAdminChangeList(ChangeList):
     ignore_params = ['object_index', 'limit']
-    
+
     def get_queryset(self, request):
         qs = super(PhraseAdminChangeList, self).get_queryset(request)
         return qs.annotate(example_count=Count('examples'))
@@ -244,13 +247,13 @@ class PhraseAdmin(admin.ModelAdmin):
     readonly_fields = ('phrase', )
     list_filter = ('examples__ws_type', 'examples__category', )
     inlines = (PhraseExampleInline, )
-    
+
     def get_changelist(self, request, **kwargs):
         return PhraseAdminChangeList
-   
+
     def example_count(self, instance):
         return mark_safe(instance.example_count)
     example_count.short_description = "Count"
     example_count.admin_order_field = "example_count"
-    
+
 admin.site.register(Phrase, PhraseAdmin)

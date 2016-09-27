@@ -95,3 +95,6 @@ db.sqlite3
 # Raw crawl file
 _raw
 _raw/*
+
+*.xlsx
+*.xls

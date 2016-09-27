@@ -182,7 +182,8 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
                 # Re-evaluate queryset
                 queryset = self.get_flashcard_queryset(request)
                 total = queryset.count()
-                object_index = random.randint(0, total - 1)
+                if total > 1:
+                    object_index = random.randint(0, total - 1)
                 objects = queryset[object_index:object_index + 1]
                 obj = objects[0] if len(objects) > 0 else None
                 form = FlashcardForm(instance=obj)
@@ -197,8 +198,9 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
         queries = request.GET.copy()
         
         # Get random example
-        queries['object_index'] = random.randint(0, total - 1)
-        next_link = queries.urlencode()
+        if total > 1:
+            queries['object_index'] = random.randint(0, total - 1)
+            next_link = queries.urlencode()
         
         queries.pop('object_index', None)
         filter_link = queries.urlencode()

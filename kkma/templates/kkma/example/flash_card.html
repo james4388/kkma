@@ -20,42 +20,44 @@
     </head>
     <body>
         <div class="flashcard container">
-            <div class="text-right return-link">
-                <a href="{% url 'admin:index' %}">Home</a> / <a href="{% url 'admin:app_list' 'kkma' %}">kkma</a> / <a href="{% url 'admin:kkma_example_changelist' %}?{{filter_link}}">Example</a>
-            </div>
-            {% if object %}
-            <div class="content">
-                {{object.content|safe}}
-            </div>
-            <div>
-                <form action="" class="example-form" method="POST">
+            <form action="" class="example-form" method="POST">
+                <div class="text-right return-link">
+                    <label class="pull-left"><input type="checkbox" name="random"/> Auto jump to random example when selected</label>
+                    
+                    <a href="{% url 'admin:index' %}">Home</a> / <a href="{% url 'admin:app_list' 'kkma' %}">kkma</a> / <a href="{% url 'admin:kkma_example_changelist' %}?{{filter_link}}">Example</a>
+                </div>
+                {% if object %}
+                <div class="content">
+                    {{object.content|safe}}
+                </div>
+                <div class="form-content">
                     {% csrf_token %}
                     <input type="hidden" name="pk" value="{{object.pk}}" />
-                    {{form.category}}
-                </form>
-            </div>
-            <div class="detail-content">
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="detail_header">
-                            <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detail_pannel" aria-expanded="true" aria-controls="detail_pannel">
-                                Detail and links
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="detail_pannel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detail_header">
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-sm-4">{{object.context_link}}</div>
-                                    <div class="col-sm-8 text-right">{{object.detail_link}}</div>
+                    {{form.category}} 
+                </div>
+                <div class="detail-content">
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="detail_header">
+                                <h4 class="panel-title">
+                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detail_pannel" aria-expanded="true" aria-controls="detail_pannel">
+                                    Detail and links
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="detail_pannel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detail_header">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-sm-4">{{object.context_link}}</div>
+                                        <div class="col-sm-8 text-right">{{object.detail_link}}</div>
+                                    </div>
+                                    {{object.detail|safe}}
                                 </div>
-                                {{object.detail|safe}}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
             {% else %}
             <div class="content text-center">
                 The End!!!
@@ -64,9 +66,7 @@
             <div class="footer">
                 <div class="row">
                     <div class="col-xs-3">
-                        {% if prev_link %}
-                        <a class="btn-prev" href="?{{prev_link}}" title="[Left Arrow]">&lt;&lt; Prev</a>
-                        {% endif %}
+                        
                     </div>
                     <div class="col-xs-6">
                         {% if object %}
@@ -75,7 +75,7 @@
                     </div>
                     <div class="col-xs-3">
                         {% if next_link %}
-                        <a class="btn-next" href="?{{next_link}}" title="Press [Enter] or [Right Arrow]">Next &gt;&gt;</a>
+                        <a class="btn-next" href="?{{next_link}}" title="Press [Enter] or [Right Arrow]">Random next &gt;&gt;</a>
                         {% endif %}
                     </div>
                 </div>
@@ -83,6 +83,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <script>
             $('.flashcard form input[type="radio"]').change(function(){
@@ -114,6 +115,13 @@
                     }
                 }
             });
+            
+            var is_random = Cookies.get('random');
+            $('input[name="random"]').prop('checked', is_random==='yes');
+            $('input[name="random"]').click(function() {
+                Cookies.set('random', $(this).prop('checked') ? 'yes' : 'no', { expires: 7, path: '/'});
+            });
+            
         </script>
     </body>
 </html>

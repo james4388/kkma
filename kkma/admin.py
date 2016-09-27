@@ -15,6 +15,7 @@ from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
+import random
 
 from .forms import FlashcardForm
 
@@ -171,28 +172,34 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
 
         total = queryset.count()
 
-        objects = queryset[object_index:object_index + 1]
-        obj = objects[0] if len(objects) > 0 else None
-
         form = None
         if request.method == 'POST':
             obj = get_object_or_404(Example, pk=request.POST.get('pk'))
             form = FlashcardForm(request.POST, instance=obj)
             if form.is_valid():
                 form.save()
+            if request.POST.get('random'):
+                # Re-evaluate queryset
+                queryset = self.get_flashcard_queryset(request)
+                total = queryset.count()
+                object_index = random.randint(0, total - 1)
+                objects = queryset[object_index:object_index + 1]
+                obj = objects[0] if len(objects) > 0 else None
+                form = FlashcardForm(instance=obj)
         else:
+            objects = queryset[object_index:object_index + 1]
+            obj = objects[0] if len(objects) > 0 else None
             if obj:
                 form = FlashcardForm(instance=obj)
 
         prev_link = None
         next_link = None
         queries = request.GET.copy()
-        if object_index > 0:
-            queries['object_index'] = object_index - 1
-            prev_link = queries.urlencode()
-        if object_index < total:
-            queries['object_index'] = object_index + 1
-            next_link = queries.urlencode()
+        
+        # Get random example
+        queries['object_index'] = random.randint(0, total - 1)
+        next_link = queries.urlencode()
+        
         queries.pop('object_index', None)
         filter_link = queries.urlencode()
         return render(request, self.flash_card_template, {
@@ -200,7 +207,6 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
             'total': total,
             'index': object_index,
             'form': form,
-            'prev_link': prev_link,
             'next_link': next_link,
             'filter_link': filter_link
         })

@@ -27,6 +27,11 @@ body {
     padding: 0 10px;
 }
 
+.return-link label{
+    font-weight: normal;
+    margin: 0;
+}
+
 .content{
     font-size: 48px;
     line-height: 55px;

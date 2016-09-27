@@ -152,3 +152,8 @@ SUIT_CONFIG = {
     # misc
     # 'LIST_PER_PAGE': 15
 }
+
+try:
+    from local import *
+except ImportError:
+    pass

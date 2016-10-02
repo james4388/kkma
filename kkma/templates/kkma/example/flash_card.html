@@ -30,10 +30,19 @@
                 <div class="content">
                     {{object.content|safe}}
                 </div>
-                <div class="form-content">
-                    {% csrf_token %}
-                    <input type="hidden" name="pk" value="{{object.pk}}" />
-                    {{form.category}} 
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-content">
+                            {% csrf_token %}
+                            <input type="hidden" name="pk" value="{{object.pk}}" />
+                            {{form.category}} 
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="translate">
+                            Click highlighted word to see translate
+                        </div>
+                    </div>
                 </div>
                 <div class="detail-content">
                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -121,6 +130,42 @@
             $('input[name="random"]').click(function() {
                 Cookies.set('random', $(this).prop('checked') ? 'yes' : 'no', { expires: 7, path: '/'});
             });
+            
+            // Translate
+            {% if object %}
+            var translate = {};
+            $.get('{% url 'admin:kkma_example_translate' %}?query='+$('.content').text().trim(), function(data) {
+                translate = data;
+                var nodes = $(".content").get(0).childNodes;
+                var wrapedHtml = '';
+                for (var i=0, l=nodes.length; i < l; i++) {
+                    var node = nodes[i];
+                    if (node.nodeType === 3) {  // Textnode
+                        var words = node.data.trim().split(' ');
+                        for (var j=0; j<words.length; j++) {
+                            if (translate[words[j]]) {
+                                wrapedHtml += '<span class="highlight">' + words[j] + '</span> ';
+                            } else {
+                                wrapedHtml += words[j] + ' ';
+                            }
+                        }
+                    } else if (node.nodeType === 1) {
+                        node.className = 'highlight';
+                        wrapedHtml += node.outerHTML + ' ';
+                    }
+                }
+                $(".content").html(wrapedHtml);
+            });
+            
+            $('.content').on('click', '.highlight', function() {
+                var text = $(this).text();
+                if (translate[text].length > 0) {
+                    $('.translate').html('<div class="text-center"><a href="http://vndic.naver.com/search.nhn?query='+text+'" target="_blank">'+text+'</a></div>' + translate[text].join(''));
+                } else {
+                    $('.translate').html('<div class="text-center"><a href="http://vndic.naver.com/search.nhn?query='+text+'" target="_blank">'+text+'</a></div');
+                }
+            });
+            {% endif %}
             
         </script>
     </body>

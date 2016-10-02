@@ -16,7 +16,9 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 import random
+from django.http import JsonResponse
 
+from .naver import translate
 from .forms import FlashcardForm
 
 
@@ -141,6 +143,9 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
             url(r'^flash-card/$',
                 self.admin_site.admin_view(self.flash_card_view),
                 name='%s_%s_flashcard' % self.get_model_info()),
+            url(r'^translate/$',
+                self.admin_site.admin_view(self.translate_view),
+                name='%s_%s_translate' % self.get_model_info()),
         ]
         return my_urls + urls
 
@@ -160,6 +165,13 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
             return cl.queryset
         except AttributeError:
             return cl.query_set
+            
+    def translate_view(self, request, *args, **kwargs):
+        query = request.GET.get('query')
+        meaning = {}
+        if query:
+            meaning = translate(query)
+        return JsonResponse(meaning)
 
     def flash_card_view(self, request, *args, **kwargs):
         object_index = request.GET.get('object_index', 0)

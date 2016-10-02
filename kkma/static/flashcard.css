@@ -39,6 +39,17 @@ body {
     border-bottom: 1px solid #e6e6e6;
 }
 
+.highlight {
+    cursor: pointer;
+    background: rgb(255, 251, 204);
+}
+
+.translate {
+    height: 350px;
+    overflow-y: auto;
+    font-size: 20px;
+}
+
 .detail-content{
     border-top: 1px solid #e6e6e6;
     padding-top: 20px;

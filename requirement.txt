@@ -4,3 +4,6 @@ ipython==5.1.0
 pyreadline==2.1
 django-import-export==0.5.0
 django-debug-toolbar
+requests
+https://pypi.python.org/packages/35/a7/6a1a44d3a37358f8fda5d1b992c837cb2db8940293c2d84faa145f29e88a/lxml-3.6.0-cp27-none-win_amd64.whl#md5=d4211f44cabfbe03dbe678342c0acc86
+pyquery==1.2.13

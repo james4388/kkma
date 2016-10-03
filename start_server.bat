@@ -28,8 +28,6 @@ set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
 git pull
 
-pip install -r requirement.txt
-
 python manage.py migrate
 
 start /B python manage.py runserver 0.0.0.0:8000

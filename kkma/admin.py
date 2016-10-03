@@ -107,12 +107,13 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = ExampleResource
     list_display = ('_index', '_content', 'category',
                     'detail_link', 'context_link', 'field_id', 'part_id',
-                    'sent_id')
+                    'sent_id', 'modified_on')
     list_editable = ('category',)
     list_filter = (
         'ws_type',
         ('category', CategoryListFilter, ),
-        'viewed', 'word_type', 'morpheme'
+        'viewed', 'word_type', 'morpheme',
+        'modified_on'
     )
     search_fields = ('content',)
     exclude = ('phrases', )

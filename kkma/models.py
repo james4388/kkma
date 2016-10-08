@@ -11,7 +11,7 @@ import re
 
 
 class Phrase(models.Model):
-    phrase = models.CharField(unique=True, max_length=300)
+    phrase = models.CharField(unique=True, max_length=255)
     count = models.IntegerField(default=1, verbose_name='Total Count')
     
     class Meta:

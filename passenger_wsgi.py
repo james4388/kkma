@@ -31,8 +31,6 @@ if not is_venv_python():
 log.flush()
 log.close()
 
-from paste.deploy import loadapp
-
 sys.path.insert(0, os.path.join(BASE_DIR, 'env', 'bin'))
 sys.path.insert(0, os.path.join(
     BASE_DIR, 'env', 'lib', 'python2.7', 'site-packages', 'django'
@@ -44,23 +42,4 @@ sys.path.insert(0, os.path.join(
 os.environ['DJANGO_SETTINGS_MODULE'] = "kkmadb.settings"
 
 from django.core.wsgi import get_wsgi_application
-# application = get_wsgi_application()
-
-def application(environ, start_response):
-    log = _get_log()
-    print >>log, "Application called:"
-    print >>log, "environ: %s" % str(environ)
-    results = []
-    try:
-        app = get_wsgi_application()
-        print >>log, "App loaded, attempting to run"
-        log.flush()
-        results = app(environ, start_response)
-        print >>log, "App executed successfully"
-    except Exception, inst:
-        print >>log, "Error: %s" % str(type(inst))
-        print >>log, inst.args
-        log.flush()
-    finally:
-        log.close()
-    return results
+application = get_wsgi_application()

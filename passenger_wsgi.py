@@ -2,7 +2,7 @@ import sys, os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-sys.path.append(os.path.join(BASE_DIR))  #You must add your project here or 500
+sys.path.append(os.path.join(BASE_DIR, 'kkmadb'))  #You must add your project here or 500
 
 #Switch to new python
 #You may try to replace $HOME with your actual path

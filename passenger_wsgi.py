@@ -26,7 +26,7 @@ if not is_venv_python():
     print >>log, "Detected wrong interpreter location, swapping to %s" % (PYTHON_PATH)
     log.flush()
     log.close()
-    os.execl(PYTHON_PATH, "python2.7.12", *sys.argv + (VIRTUAL_ENV_PYTHON, ))
+    os.execl(PYTHON_PATH, "python2.7.12", *sys.argv + [VIRTUAL_ENV_PYTHON])
     
 log.flush()
 log.close()

@@ -16,8 +16,6 @@ sys.path.append(os.path.join(BASE_DIR, 'kkmadb'))  #You must add your project he
 #You may try to replace $HOME with your actual path
 PYTHON_PATH = os.path.join(BASE_DIR, 'env', 'bin', 'python')
 if not is_venv_python():
-    log.flush()
-    log.close()
     os.execl(PYTHON_PATH, "python2.7.12", *sys.argv + [VIRTUAL_ENV_PYTHON])
 
 sys.path.insert(0, os.path.join(BASE_DIR, 'env', 'bin'))

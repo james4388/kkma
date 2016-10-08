@@ -6,6 +6,7 @@ def _get_log():
     return file(os.path.join(BASE_DIR, 'tmp', 'log.txt'), 'a')
 log = _get_log()
 print >>log, "Running %s" % (sys.executable)
+print >>log, "sys.argv", sys.argv
 
 sys.path.append(os.path.join(BASE_DIR, 'kkmadb'))  #You must add your project here or 500
 

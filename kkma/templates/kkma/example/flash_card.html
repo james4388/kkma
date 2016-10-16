@@ -22,7 +22,7 @@
         <div class="flashcard container">
             <form action="" class="example-form" method="POST">
                 <div class="text-right return-link">
-                    <label class="pull-left"><input type="checkbox" name="random"/> Auto jump to random example when selected</label>
+                    <!--label class="pull-left"><input type="checkbox" name="random"/> Auto jump to random example when selected</label-->
                     
                     <a href="{% url 'admin:index' %}">Home</a> / <a href="{% url 'admin:app_list' 'kkma' %}">kkma</a> / <a href="{% url 'admin:kkma_example_changelist' %}?{{filter_link}}">Example</a>
                 </div>
@@ -44,25 +44,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="detail-content">
-                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="detail_header">
-                                <h4 class="panel-title">
-                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detail_pannel" aria-expanded="true" aria-controls="detail_pannel">
-                                    Detail and links
-                                    </a>
-                                </h4>
-                            </div>
-                            <div id="detail_pannel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detail_header">
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="col-sm-4">{{object.context_link}}</div>
-                                        <div class="col-sm-8 text-right">{{object.detail_link}}</div>
-                                    </div>
-                                    {{object.detail|safe}}
-                                </div>
-                            </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="id_prefix">Prefix</label>
+                            {{form.prefix}} 
+                        </div>
+                        <div class="form-group">
+                            <label for="id_suffix">Suffix</label>
+                            {{form.suffix}} 
                         </div>
                     </div>
                 </div>

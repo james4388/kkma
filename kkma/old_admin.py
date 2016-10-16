@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 from django.contrib import admin
 from .models import Example, Phrase
 from import_export import resources
@@ -7,7 +5,6 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin, ImportExpor
 from import_export import fields
 from django.utils.html import strip_tags
 from django.shortcuts import render
-from django.http import JsonResponse
 from django.conf.urls import url
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.filters import ChoicesFieldListFilter
@@ -24,8 +21,6 @@ from django.http import JsonResponse
 from .naver import translate
 from .forms import FlashcardForm
 
-from utils import import_xls
-
 
 class IgnoreParamChangeList(ChangeList):
     ignore_params = ['object_index', 'limit']
@@ -41,11 +36,11 @@ class IgnoreParamChangeList(ChangeList):
 class ExampleResource(resources.ModelResource):
     class Meta:
         model = Example
-        fields = ('content', 'category', 'prefix', 'suffix', 'morpheme', 'used_in')
-        export_order = ('content', 'morpheme', 'category', 'prefix', 'suffix', 'used_in')
+        fields = ('index', 'content', 'category',)
+        export_order = ('index', 'content', 'category',)
 
     def dehydrate_content(self, row):
-        return strip_tags(row.content)
+        return strip_tags(row.content).replace('&#13;', '')
 
 
 class CategoryListFilter(ChoicesFieldListFilter):
@@ -110,11 +105,14 @@ class ExamplePhraseInline(admin.TabularInline):
 
 class ExampleAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = ExampleResource
-    list_display = ('content_display', 'category', 'prefix', 'suffix', 'morpheme', 'used_in',)
-    list_editable = ('category', 'prefix', 'suffix')
+    list_display = ('_index', '_content', 'category',
+                    'detail_link', 'context_link', 'field_id', 'part_id',
+                    'sent_id', 'modified_on')
+    list_editable = ('category',)
     list_filter = (
+        'ws_type',
         ('category', CategoryListFilter, ),
-        'morpheme', 'used_in', 
+        'viewed', 'word_type', 'morpheme',
         'modified_on'
     )
     search_fields = ('content',)
@@ -123,19 +121,6 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
 
     change_list_template = 'kkma/example/change_list.html'
     flash_card_template = 'kkma/example/flash_card.html'
-    
-    def content_display(self, instance):
-        content = instance.content
-        for phrase in instance.phrases.all():
-            content = content.replace(phrase.phrase, u'<b>%s</b>' % phrase.phrase)
-        return mark_safe(content)
-    content_display.short_description = '용례'
-
-    
-    def get_queryset(self, request, *args, **kwargs):
-        qs = super(ExampleAdmin, self).get_queryset(request, *args, **kwargs)
-        return qs.prefetch_related('phrases')
-        
 
     def get_changelist(self, request, **kwargs):
         return IgnoreParamChangeList
@@ -162,9 +147,6 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
             url(r'^translate/$',
                 self.admin_site.admin_view(self.translate_view),
                 name='%s_%s_translate' % self.get_model_info()),
-            url(r'^import/$',
-                self.admin_site.admin_view(self.import_xls_view),
-                name='%s_%s_import' % self.get_model_info()),
         ]
         return my_urls + urls
 
@@ -183,7 +165,7 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
         try:
             return cl.queryset
         except AttributeError:
-            return cl.query_set.prefetch_related('phrases')
+            return cl.query_set
             
     def translate_view(self, request, *args, **kwargs):
         query = request.GET.get('query')
@@ -223,14 +205,7 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
             obj = objects[0] if len(objects) > 0 else None
             if obj:
                 form = FlashcardForm(instance=obj)
-        
-        # Highlight phrase
-        if obj:
-            content = obj.content
-            for phrase in obj.phrases.all():
-                content = content.replace(phrase.phrase, u'<b>%s</b>' % phrase.phrase)
-            obj.content = content
-        
+
         prev_link = None
         next_link = None
         queries = request.GET.copy()
@@ -250,36 +225,7 @@ class ExampleAdmin(ExportMixin, admin.ModelAdmin):
             'next_link': next_link,
             'filter_link': filter_link
         })
-        
-    def import_xls_view(self, request, *args, **kwargs):
-        REQUIRE_PARAMS = ['file_path', 'morpheme', 'used_in']
-        params = {
-            'dry_run': False,   # Test run, no import needed
-            'content_col': 1,   # Column B  C   D   E   F   G
-            'category_col': 3,  # Column 1  2   3   4   5   6
-            'prefix_col': 4,
-            'suffix_col': 5,
-            'exclude_rich': 2,  # Exclude 2 last rich text map
-            'start_from': 1,    # Row #2, exclude header
-        }
-        OPTIONAL_PARAMS = params.keys()
-        for param in REQUIRE_PARAMS:
-            value = request.GET.get(param)
-            if not value:
-                return JsonResponse({"error": "Missing param: %s" % param})
-            params[param] = value
-        for param in OPTIONAL_PARAMS:
-            value = request.GET.get(param)
-            if value:
-                if isinstance(params[param], bool):
-                    params[param] = value.lower() in ['true','yes','1']
-                elif isinstance(params[param], int):
-                    try:
-                        params[param] = int(value)
-                    except ValueError:
-                        return JsonResponse({"error": "Param %s is not a valid integer" % param})
-        success, result = import_xls(**params)
-        return JsonResponse({"success": success, "result": result, "params": params})
+
 
 admin.site.register(Example, ExampleAdmin)
 
@@ -298,9 +244,7 @@ class PhraseExampleInline(admin.TabularInline):
         return qs.select_related('example')
 
     def _example(self, instance):
-        content = unicode(instance.example)
-        content = content.replace(instance.phrase.phrase, u'<b>%s</b>' % instance.phrase.phrase)
-        return mark_safe(content)
+        return mark_safe(instance.example)
     _example.short_description = "Example"
 
     def _example_link(self, instance):
@@ -322,7 +266,7 @@ class PhraseAdminChangeList(ChangeList):
 class PhraseAdmin(admin.ModelAdmin):
     list_display = ('phrase', 'example_count', 'count', )
     readonly_fields = ('phrase', )
-    list_filter = ('examples__morpheme', 'examples__category', 'examples__used_in')
+    list_filter = ('examples__ws_type', 'examples__category', )
     inlines = (PhraseExampleInline, )
 
     def get_changelist(self, request, **kwargs):

@@ -7,17 +7,19 @@ from .models import Example
 class ExampleImportForm(forms.ModelForm):
     class Meta:
         model = Example
-        fields = ['word_type', 'ws_type', 'morpheme',
-                  'index', 'content', 'detail', 'field_id',
-                  'part_id', 'sent_id']
+        fields = ['morpheme', 'content', 'used_in', 'prefix', 'suffix', 'category']
                   
 
 class FlashcardForm(forms.ModelForm):
     category = forms.ChoiceField(widget=forms.RadioSelect)
-
+    
     class Meta:
         model = Example
-        fields = ['category']
+        fields = ['category', 'prefix', 'suffix',]
+        widgets = {
+            'prefix': forms.TextInput(attrs={'class': 'form-control'}),
+            'suffix': forms.TextInput(attrs={'class': 'form-control'}),
+        }
         
     def __init__(self, *args, **kwargs):
         super(FlashcardForm, self).__init__(*args, **kwargs)

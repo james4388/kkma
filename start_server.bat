@@ -26,7 +26,9 @@ if defined _OLD_VIRTUAL_PATH (
 )
 set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
-git pull
+git fetch --all
+
+git reset --hard origin/master
 
 python manage.py migrate
 

@@ -74,7 +74,7 @@ def import_xls(file_path, morpheme, used_in, **kwargs):
         )
         
         if not kwargs.get('dry_run', False):
-            example, created = Example.objects.get_or_create(
+            example, created = Example.objects.update_or_create(
                 content=data['content'], morpheme=data['morpheme'], used_in=data['used_in'],
                 defaults=data
             )

@@ -108,6 +108,11 @@ class ExamplePhraseInline(admin.TabularInline):
     _phrase_link.short_description = "Link"
 
 
+class ExamplePhraseInline(admin.TabularInline):
+    model = Phrase.examples.through
+    extra = 1
+
+
 class ExampleAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = ExampleResource
     list_display = ('content_display', 'category', 'prefix', 'suffix', 'morpheme', 'used_in',)
@@ -321,7 +326,7 @@ class PhraseAdminChangeList(ChangeList):
 
 class PhraseAdmin(admin.ModelAdmin):
     list_display = ('phrase', 'example_count', 'count', )
-    readonly_fields = ('phrase', )
+    #readonly_fields = ('phrase', )
     list_filter = ('examples__morpheme', 'examples__category', 'examples__used_in')
     inlines = (PhraseExampleInline, )
 

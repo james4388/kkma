@@ -111,6 +111,7 @@ class ExamplePhraseInline(admin.TabularInline):
 class ExamplePhraseInline(admin.TabularInline):
     model = Phrase.examples.through
     extra = 1
+    raw_id_fields= ('phrase',)
 
 
 class ExampleAdmin(ExportMixin, admin.ModelAdmin):
@@ -327,6 +328,7 @@ class PhraseAdminChangeList(ChangeList):
 class PhraseAdmin(admin.ModelAdmin):
     list_display = ('phrase', 'example_count', 'count', )
     #readonly_fields = ('phrase', )
+    search_fields = ('phrase', )
     list_filter = ('examples__morpheme', 'examples__category', 'examples__used_in')
     inlines = (PhraseExampleInline, )
 

@@ -19,7 +19,7 @@
         <![endif]-->
     </head>
     <body>
-        <div class="flashcard container">
+        <div class="flashcard container-fluid">
             <form action="" class="example-form" method="POST">
                 <div class="text-right return-link">
                     <!--label class="pull-left"><input type="checkbox" name="random"/> Auto jump to random example when selected</label-->
@@ -31,21 +31,7 @@
                     {{object.content|safe}}
                 </div>
                 <div class="row">
-                    <div class="col-sm-4">
-                        <div class="form-content">
-                            {% csrf_token %}
-                            <input type="hidden" name="pk" value="{{object.pk}}" />
-                            {{form.category}} 
-                        </div>
-                    </div>
-                    <div class="col-sm-8">
-                        <div class="translate">
-                            
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
+                    <div class="col-sm-3">
                         <div class="form-group">
                             <label for="id_prefix">Prefix</label>
                             {{form.prefix}} 
@@ -53,6 +39,18 @@
                         <div class="form-group">
                             <label for="id_suffix">Suffix</label>
                             {{form.suffix}} 
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-content">
+                            {% csrf_token %}
+                            <input type="hidden" name="pk" value="{{object.pk}}" />
+                            {{form.category}} 
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="translate">
+                            
                         </div>
                     </div>
                 </div>
